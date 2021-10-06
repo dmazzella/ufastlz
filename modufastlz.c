@@ -58,7 +58,7 @@ STATIC mp_obj_t ufastlz_compress(size_t n_args, const mp_obj_t *args, mp_map_t *
 
     if (level != 1 && level != 2)
     {
-        mp_raise_ValueError(MP_ERROR_TEXT("level must be 1 or 2"));
+        mp_raise_ValueError(MP_ERROR_TEXT("level must be either 1 or 2"));
     }
 
     if (bufinfo_data.len < 16)
@@ -67,12 +67,13 @@ STATIC mp_obj_t ufastlz_compress(size_t n_args, const mp_obj_t *args, mp_map_t *
     }
 
     vstr_t vstr_out;
-    vstr_init(&vstr_out, MAX((int)(1.05 * bufinfo_data.len), 66));
+    vstr_init(&vstr_out, MAX((mp_int_t)(1.05 * bufinfo_data.len), 66));
 
-    if(!(vstr_out.len = fastlz_compress_level(level, bufinfo_data.buf, bufinfo_data.len, vstr_out.buf)))
+    if (!(vstr_out.len = fastlz_compress_level(level, bufinfo_data.buf, bufinfo_data.len, vstr_out.buf)))
     {
         mp_raise_msg_varg(&mp_type_ValueError, MP_ERROR_TEXT("compress: %d"), vstr_out.len);
     }
+
     mp_obj_t out = mp_obj_new_bytes((const byte *)vstr_out.buf, vstr_out.len);
     vstr_clear(&vstr_out);
     return out;
@@ -100,7 +101,7 @@ STATIC mp_obj_t ufastlz_decompress(size_t n_args, const mp_obj_t *args, mp_map_t
     vstr_t vstr_out;
     vstr_init(&vstr_out, maxout);
 
-    if(!(vstr_out.len = fastlz_decompress(bufinfo_data.buf, bufinfo_data.len, vstr_out.buf, maxout)))
+    if (!(vstr_out.len = fastlz_decompress(bufinfo_data.buf, bufinfo_data.len, vstr_out.buf, maxout)))
     {
         mp_raise_msg_varg(&mp_type_ValueError, MP_ERROR_TEXT("decompress: %d"), vstr_out.len);
     }
